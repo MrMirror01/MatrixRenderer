@@ -37,8 +37,11 @@ class Matrix:
         output = []
         for i in range(self.rows):
             output.append([])
-            for j in range(self.columns):
-                output[i].append(self.matrix[i][j] - other.matrix[i][j])
+            if self.columns == 1: # ako je vektor
+                output[i] = self.matrix[i] - other.matrix[i]
+            else:
+                for j in range(self.columns):
+                    output[i].append(self.matrix[i][j] - other.matrix[i][j])
         return Matrix(self.rows, self.columns, output)
 
     # množenje matrica
@@ -105,8 +108,18 @@ class Matrix:
             raise Exception("Can't normalize matrices")
 
         length = math.sqrt(self.x ** 2 + self.y ** 2 + self.z ** 2)
+        if length == 0:
+            return self
         self.x /= length
         self.y /= length
         self.z /= length
 
         return self
+
+    @staticmethod
+    def cross(a, b):
+        a = Matrix.normalize(a)
+        b = Matrix.normalize(b)
+        return Matrix(3, 1, [(a.y * b.z) - (a.z * b.y),
+                             (a.z * b.x) - (a.x * b.z),
+                             (a.x * b.y) - (a.y * b.x)])

@@ -1,4 +1,3 @@
-import math
 from Matrix import *
 
 
@@ -86,7 +85,8 @@ class Object:
         ])
 
         return Object(object.position.matrix, object.rotation.matrix, object.scale.matrix,
-                      [(positionTransform * rotateTransformZ * rotateTransformY *
-                       rotateTransformX * scaleTransform * vert).matrix for vert in object.vertices],
-                      object.triangles, [(positionTransform * rotateTransformZ * rotateTransformY *
-                       rotateTransformX * scaleTransform * norm).matrix for norm in object.normals])
+                      [(rotateTransformZ * rotateTransformY * rotateTransformX
+                        * scaleTransform * positionTransform * vert).matrix for vert in object.vertices],
+                      object.triangles,
+                      [(rotateTransformZ * rotateTransformY * rotateTransformX
+                        * scaleTransform * positionTransform * norm).matrix for norm in object.normals])

@@ -1,3 +1,5 @@
+import math
+
 from Object import *
 
 
@@ -9,7 +11,7 @@ class Camera:
         self.height = height
         self.znear = znear
         self.zfar = zfar
-        self.fov = fov
+        self.fov = (math.radians(fov[0]), math.radians(fov[0]))
 
         rx = math.radians(self.rotation.x)
         ry = math.radians(self.rotation.y)
@@ -78,10 +80,9 @@ class Camera:
         ])
 
         return Object(obj.position.matrix, obj.rotation.matrix, obj.scale.matrix,
-                      [(rotateTransformZ * rotateTransformY * rotateTransformX * positionTransform * vert).matrix
+                      [(rotateTransformX * rotateTransformY * rotateTransformZ * positionTransform * vert).matrix
                        for vert in obj.vertices], obj.triangles,
-                      [(positionTransform * rotateTransformZ * rotateTransformY * rotateTransformX * norm).matrix
-                       for norm in obj.normals])
+                      [norm.matrix for norm in obj.normals])
 
     def cameraSpaceToOrtho(self, obj):
         transformMatrix = Matrix(4, 4, [
@@ -97,22 +98,26 @@ class Camera:
 
     def cameraSpaceToPerspective(self, obj):
         transformMatrix = Matrix(4, 4, [
-            [math.atan(self.fov[0] / 2), 0, 0, 0],
-            [0, math.atan(self.fov[1] / 2), 0, 0],
-            [0, 0, -((self.zfar + self.znear) / (self.zfar - self.znear)), -((2 * self.zfar * self.znear) / (self.zfar - self.znear))],
+            [1 / math.tan(self.fov[0] / 2), 0, 0, 0],
+            [0, 1 / math.tan(self.fov[1] / 2), 0, 0],
+            [0, 0, -(self.zfar + self.znear) / (self.zfar - self.znear), 2 * self.zfar * self.znear / (self.znear - self.zfar)],
             [0, 0, -1, 0]
         ])
 
-        transformedVert = [(transformMatrix * vert).matrix for vert in obj.vertices]
-        for vert in transformedVert:
-            if vert[3] != 0:
-                vert[0] /= vert[3]
-                vert[1] /= vert[3]
-                vert[2] /= vert[3]
-            vert[0] = (vert[0] + 1) / 2
-            vert[1] = (vert[1] + 1) / 2
-            vert[2] = (vert[2] + 1) / 2
+        for vert in obj.vertices:
+            vert.z *= -1
 
+
+        transformedVert = [(transformMatrix * vert) for vert in obj.vertices]
+        for vert in transformedVert:
+            if vert.w != 0:
+                vert.x /= vert.w
+                vert.y /= vert.w
+                #vert.z /= vert.w
+            vert.x = (vert.x + 1) / 2
+            vert.y = (vert.y + 1) / 2
+
+        #TODO: dela z clipping ali mislim ka ne onak kak bi trebalo ak kuzis kaj ocu reci
         return Object(obj.position.matrix, obj.rotation.matrix, obj.scale.matrix,
-                      [vert[:2]+[1 if vert[2] < self.znear or vert[2] > self.zfar else 0] for vert in transformedVert],
+                      [vert.matrix[:2]+[1 if vert.z < 0 or vert.z > self.zfar else 0] for vert in transformedVert],
                       obj.triangles, [norm.matrix for norm in obj.normals])
