@@ -23,6 +23,12 @@ class Matrix:
             raise Exception("Trying to add matrices of different sizes")
 
         output = []
+        # ako je vektor
+        if self.columns == 1:
+            for i in range(self.rows):
+                output.append(self.matrix[i] + other.matrix[i])
+            return Matrix(self.rows, self.columns, output)
+
         for i in range(self.rows):
             output.append([])
             for j in range(self.columns):
@@ -32,9 +38,15 @@ class Matrix:
     # oduzimanje matrica
     def __sub__(self, other):
         if self.rows != other.rows or self.columns != other.columns:
-            raise Exception("Trying to add matrices of different sizes")
+            raise Exception("Trying to subtracrt matrices of different sizes")
 
         output = []
+        # ako je vektor
+        if self.columns == 1:
+            for i in range(self.rows):
+                output.append(self.matrix[i] - other.matrix[i])
+            return Matrix(self.rows, self.columns, output)
+
         for i in range(self.rows):
             output.append([])
             if self.columns == 1: # ako je vektor
