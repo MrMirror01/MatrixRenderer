@@ -1,5 +1,7 @@
+import time
+
 import cv2
-import numpy
+import time
 from Camera import *
 from Shading import *
 
@@ -102,14 +104,13 @@ while True:
         ]) * 1000  # mnozimo sa dimenzijom slike
 
         ori = orientation(polygon)
-        dot = -Matrix.dot(onScreen.normals[i].normalize(), Matrix(4, 1, [1, 1, 1, 0]).normalize())
+        # dot = -Matrix.dot(onScreen.normals[i].normalize(), Matrix(4, 1, [1, 1, 1, 0]).normalize())
         center = worldSpaceObj.vertices[onScreen.triangles[i][0]] + \
                  worldSpaceObj.vertices[onScreen.triangles[i][1]] + \
                  worldSpaceObj.vertices[onScreen.triangles[i][2]]
         center = Matrix(3, 1, [i / 3 for i in center.matrix[:3]])
         currColor = shading.calculateFaceColor(center,
                                                Matrix(3, 1, worldSpaceObj.normals[i].matrix[:3]))
-        print(currColor)
 
         # backface culling
         if ori > 0:                                         # PAZI: BGR color

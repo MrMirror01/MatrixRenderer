@@ -107,7 +107,6 @@ class Camera:
         for vert in obj.vertices:
             vert.z *= -1
 
-
         transformedVert = [(transformMatrix * vert) for vert in obj.vertices]
         for vert in transformedVert:
             if vert.w != 0:
