@@ -1,7 +1,4 @@
-import time
-
 import cv2
-import time
 from Camera import *
 from Shading import *
 
@@ -46,7 +43,7 @@ kocka = Object((0, 0, 0), (0, 0, 0), (5, 5, 5),
 cam = Camera((0, -3, -5), (-30, 0, 0), 20, 20, .1, 100, (90, 90))
 
 #TODO: skuzi kaj je ew(center of projection in world coordinates)
-shading = Shading(2, 5, Matrix(3, 1, [5, 10, -5]),
+shading = Shading(2, 3, Matrix(3, 1, [5, 10, -5]),
                   Matrix(3, 1, [cam.position.x, cam.position.y, (cam.position.z + cam.zfar) / 2]), 20, 3, 1, 1)
 
 while True:
@@ -79,8 +76,12 @@ while True:
     elif key == ord('u'):
         cam.rotation.z -= 3
 
+    #--------------------------OBJECT----------------------------------
     teapot.rotation.y += 30
     worldSpaceObj = Object.objectToWorldSpace(teapot)
+    #kocka.rotation.y += 2
+    #kocka.rotation.x += 1
+    #worldSpaceObj = Object.objectToWorldSpace(kocka)
     camSpaceObj = cam.worldToCameraSpace(worldSpaceObj)
     onScreen = cam.cameraSpaceToPerspective(camSpaceObj)
 

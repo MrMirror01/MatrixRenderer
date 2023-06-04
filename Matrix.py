@@ -1,5 +1,4 @@
 import math
-from numba import cuda, jit
 import numpy
 
 
@@ -62,27 +61,7 @@ class Matrix:
     def __mul__(self, other):
         if self.columns != other.rows:
             raise Exception("Trying to multiply matrices that can't be multiplied")
-        '''
-        threadsPerBlock = (16, 16)
-        blocksPerGrid = ((self.rows + (threadsPerBlock[0] - 1)) // threadsPerBlock[0],
-                         (other.columns + (threadsPerBlock[1] - 1)) // threadsPerBlock[1])
 
-        for i in range(self.rows):
-            for j in range(self.columns):
-                if self.columns != 1:
-                    self.matrix[i][j] = float(self.matrix[i][j])
-        for i in range(other.rows):
-            for j in range(other.columns):
-                if other.columns != 1:
-                    other.matrix[i][j] = float(other.matrix[i][j])
-        result = [[0.0] * other.columns] * self.rows
-        mat1 = numpy.array(self.matrix)
-        mat2 = numpy.array(other.matrix)
-        res = numpy.array(result)
-
-        Matrix.__GPU_multiply[threadsPerBlock, blocksPerGrid](mat1, mat2, res)
-        return Matrix(self.rows, other.columns, res.tolist())
-        '''
         output = []
         for i in range(self.rows):
             if other.columns != 1:  # ako je matrica
@@ -99,21 +78,6 @@ class Matrix:
                 else:
                     output.append(element)
         return Matrix(self.rows, other.columns, output)
-
-
-    '''
-    @staticmethod
-    @cuda.jit
-    def __GPU_multiply(matrix1, matrix2, result):
-        x, y = cuda.grid(2)
-        rows = result.shape[0]
-        columns = result.shape[1]
-        if x < rows:
-            if y < columns:
-                for i in range(matrix1.shape[1]):
-                    result[x, y] += matrix1[x, i % matrix1.shape[1]] * matrix2[i % matrix2.shape[0], y]
-
-    '''
 
     # za lakse koristenje vektora
     @property
